@@ -74,18 +74,154 @@
   {
     "type": "function",
     "function": {
-      "name": "runPythonFile",
-      "description": "Runs a Python file. Must include .py",
+      "name": "delete",
+      "description": "Deletes a file at the specified path.",
       "parameters": {
         "type": "object",
         "properties": {
           "file": {
             "type": "string",
-            "description": "Python file path to execute."
+            "description": "File path to delete."
           }
         },
         "required": ["file"]
       }
     }
-  }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "createDirectory",
+      "description": "Creates a new directory at the specified path.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "directory": {
+            "type": "string",
+            "description": "Directory path to create."
+          }
+        },
+        "required": ["directory"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "deleteDirectory",
+      "description": "Deletes a directory at the specified path.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "directory": {
+            "type": "string",
+            "description": "Directory path to delete."
+          }
+        },
+        "required": ["directory"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "moveFile",
+      "description": "Moves a file from source path to destination path.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "description": "Source file path."
+          },
+          "destination": {
+            "type": "string",
+            "description": "Destination file path."
+          }
+        },
+        "required": ["source", "destination"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "copyFile",
+      "description": "Copies a file from source path to destination path.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "description": "Source file path."
+          },
+          "destination": {
+            "type": "string",
+            "description": "Destination file path."
+          }
+        },
+        "required": ["source", "destination"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "getCurrentDirectory",
+      "description": "Returns the current working directory path.",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type":"function",
+    "function":{
+      "name": "runCommand",
+      "description": "Runs a shell command and returns its output.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "The shell command to execute."
+          }
+        },
+        "required": ["command"]
+      }
+    }
+  },
+  {
+    "type":"function",
+    "function":{
+      "name": "fileExists",
+      "description": "Checks if a file exists at the specified path.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "description": "File path to check."
+          }
+        },
+        "required": ["file"]
+      }
+    }
+  },
+  {"type": "function",
+    "function": {
+      "name": "getFileSize",
+      "description": "Returns the size of a file in bytes.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "description": "File path to get the size of."
+          }
+        },
+        "required": ["file"]
+      }
+    }}
 ]

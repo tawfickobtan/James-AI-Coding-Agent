@@ -17,8 +17,16 @@ functionRegistry = {
     "getItemsInPath": tools.getItemsInPath,
     "writeIntoFile": tools.writeIntoFile,
     "readFile": tools.readFile,
-    "runPythonFile": tools.runPythonFile,
-    "createFile": tools.createFile
+    "createFile": tools.createFile,
+    "delete": tools.delete,
+    "createDirectory": tools.createDirectory,
+    "deleteDirectory": tools.deleteDirectory,
+    "moveFile": tools.moveFile,
+    "copyFile": tools.copyFile,
+    "getCurrentDirectory": tools.getCurrentDirectory,
+    "runCommand": tools.runCommand,
+    "fileExists": tools.fileExists,
+    "getFileSize": tools.getFileSize,
 }
 
 # Initialise messages with system prompt
@@ -29,13 +37,13 @@ messages = [
 
 response = complete(messages)
 messages.append(response)
-print("James:")
+print("🤖 James:")
 print(response.content)
 print("_________________")
 print()
 
 while True:
-    print("User:")
+    print("👨🏻 User:")
     userInput = input()
     print("_________________")
     print()
@@ -53,7 +61,7 @@ while True:
                 id = tool_call.id
                 name = tool_call.function.name
                 args = json.loads(tool_call.function.arguments)
-                print("Executing:")
+                print("🛠️ Executing:")
                 print(name)
                 for arg in args:
                     print(arg, (args[arg] if len(args[arg]) < 50 else args[arg][:50] + "..."))
@@ -67,7 +75,7 @@ while True:
                     "content": str(result)
                 })
         else:
-            print("James:")
+            print("🤖 James:")
             print(response.content)
             print("_________________")
             print() 

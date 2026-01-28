@@ -36,12 +36,61 @@ def readFile(file):
     except Exception:
         return "Error occured."
 
-def runPythonFile(file):
+def delete(file):  
     if file in forbidden:
-        return "Cannot run this file."
+        return "You are not allowed to delete these files."
+    try:
+        os.remove(file)
+        return "File deleted successfully."
+    except Exception as e:
+        return "Error occured: " + str(e)
+
+def createDirectory(directory):
+    try:
+        os.makedirs(directory, exist_ok=True)
+        return "Directory created successfully."
+    except Exception as e:
+        return "Error occured: " + str(e)
+
+def deleteDirectory(directory):
+    if directory in forbidden:
+        return "You are not allowed to delete these directories."
+    try:
+        os.rmdir(directory)
+        return "Directory deleted successfully."
+    except Exception as e:
+        return "Error occured: " + str(e)
+
+def moveFile(source, destination):
+    if source in forbidden or destination in forbidden:
+        return "You are not allowed to move these files."
+    try:
+        os.rename(source, destination)
+        return "File moved successfully."
+    except Exception as e:
+        return "Error occured: " + str(e)
+
+def copyFile(source, destination):
+    if source in forbidden or destination in forbidden:
+        return "You are not allowed to copy these files."
+    try:
+        import shutil
+        shutil.copy2(source, destination)
+        return "File copied successfully."
+    except Exception as e:
+        return "Error occured: " + str(e)
+    
+def getCurrentDirectory():
+    try:
+        cwd = os.getcwd()
+        return f"Current directory is: {cwd}"
+    except Exception:
+        return "Error occured."
+
+def runCommand(command):
     try:
         result = subprocess.run(
-            "python " + file,
+            command,
             shell=True,
             capture_output=True,
             text=True
@@ -51,3 +100,13 @@ def runPythonFile(file):
         return output
     except Exception:
         return "Error occured."
+
+def fileExists(file):
+    return os.path.exists(file)
+
+def getFileSize(file):
+    try:
+        size = os.path.getsize(file)
+        return f"Size of {file} is {size} bytes."
+    except Exception as e:
+        return "Error occured: " + str(e)
