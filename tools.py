@@ -15,6 +15,9 @@ forbidden = [
 def getItemsInPath(path):
     return os.listdir(path)
 
+def createFile(file):
+    open(file, "w").close()
+
 def writeIntoFile(file, content):
     if file in forbidden:
         return "You are not allowed to modify these files."

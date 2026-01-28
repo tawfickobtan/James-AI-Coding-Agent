@@ -19,6 +19,23 @@
   {
     "type": "function",
     "function": {
+      "name": "createFile",
+      "description": "creates new empty file or overrides pre-existing one into an empty one",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "description": "file to be created"
+          }
+        },
+        "required": ["file"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
       "name": "writeIntoFile",
       "description": "Writes content into a file unless it is forbidden and will create file if file doesn't exist",
       "parameters": {
