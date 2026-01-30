@@ -6,14 +6,16 @@ from rich.markdown import Markdown
 from rich.theme import Theme
 import tools
 import json
+from pathlib import Path
+baseDir = Path(__file__).resolve().parent
 
 # Load config file
 config = {}
-with open("config.json", "r") as f:
+with open(baseDir / "config.json", "r") as f:
     config = json.load(f)
 
 systemPrompt = ""
-with open("system_prompt.txt", "r") as f:
+with open(baseDir / "system_prompt.txt", "r") as f:
     systemPrompt = f.read()
 
 custom_theme = Theme({
@@ -23,7 +25,7 @@ custom_theme = Theme({
 })
 
 console = Console(theme=custom_theme)
-saveMessages = open("messages.txt", "w",encoding="utf-8")
+saveMessages = open(baseDir / "messages.txt", "w",encoding="utf-8")
 
 # Define function registry
 functionRegistry = {

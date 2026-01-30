@@ -1,15 +1,17 @@
 from openai import OpenAI
 import os
 import json
+from pathlib import Path
+baseDir = Path(__file__).resolve().parent
 
 # Get configuration file
 config = {}
-with open("config.json", "r") as f:
+with open(baseDir / "config.json", "r") as f:
     config = json.load(f)
 
 # Get tool file
 tools = []
-with open("tools.json", "r") as f:
+with open(baseDir / "tools.json", "r") as f:
     tools = json.load(f)
 
 client = OpenAI(
