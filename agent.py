@@ -1,152 +1,57 @@
-from llm import complete
-from rich.console import Console
-from rich.panel import Panel
-from rich.text import Text
-from rich.markdown import Markdown
-from rich.theme import Theme
-import tools
+from openai import OpenAI
+from typing import Callable
 import json
-from pathlib import Path
-baseDir = Path(__file__).resolve().parent
-
-# Load config file
-config = {}
-with open(baseDir / "config.json", "r") as f:
-    config = json.load(f)
-
-systemPrompt = ""
-with open(baseDir / "system_prompt.txt", "r") as f:
-    systemPrompt = f.read()
-
-custom_theme = Theme({
-    "markdown.h1": "bold white",
-    "markdown.h2": "bold green",
-    "markdown.h3": "bold yellow",
-})
-
-console = Console(theme=custom_theme)
-saveMessages = open(baseDir / "messages.txt", "w",encoding="utf-8")
-
-# Define function registry
-functionRegistry = {
-    "getItemsInPath": tools.getItemsInPath,
-    "writeIntoFile": tools.writeIntoFile,
-    "readFile": tools.readFile,
-    "createFile": tools.createFile,
-    "delete": tools.delete,
-    "createDirectory": tools.createDirectory,
-    "deleteDirectory": tools.deleteDirectory,
-    "moveFile": tools.moveFile,
-    "copyFile": tools.copyFile,
-    "getCurrentDirectory": tools.getCurrentDirectory,
-    "runCommand": tools.runCommand,
-    "fileExists": tools.fileExists,
-    "getFileSize": tools.getFileSize,
-}
-
-# Create welcome message
-big_text = Text(""" █████╗ ██╗     ███████╗██████╗ ███████╗██████╗ 
-██╔══██╗██║     ██╔════╝██╔══██╗██╔════╝██╔══██╗
-███████║██║     █████╗  ██████╔╝█████╗  ██║  ██║
-██╔══██║██║     ██╔══╝  ██╔══██╗██╔══╝  ██║  ██║
-██║  ██║███████╗██║     ██║  ██║███████╗██████╔╝
-╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝  ╚═╝╚══════╝╚═════╝ 
-""", style="bold cyan")
-welcome_text = Text("Your File Management AI Agent", style="bold cyan")
-version_text = Text(f"(Version: {config.get('version', '1.1')})", style="dim white")
-welcome_panel = Panel(
-    big_text + welcome_text + "\n" + version_text,
-    title="🚀 Agent Started",
-    border_style="green",
-    padding=(0, 10)
-)
-console.print(welcome_panel)
-console.print(Text("Model: ", style="bold yellow") + Text(config.get("model", "openai/gpt-oss-120b"), style="white"))
-console.print(Text("Current Directory: ", style="bold yellow") + Text(tools.getCurrentDirectory(), style="white"))
-
-console.print()  # Blank line for spacing
-
-# Initialise messages with system prompt
-messages = [
-    {"role": "system",
-     "content": systemPrompt +
-                "\n\n" + "Current Directory: " + tools.getCurrentDirectory() +
-                "\n\n" + "Current Items in Directory:\n" + tools.getItemsInPath(tools.getCurrentDirectory())}
-]
 
 
-agentPanel = Panel("🤖 Alfred:",
-                     border_style="green",
-                     expand=False,
-                     style="bold blue")
+class Agent:
+    def __init__(self, base_url: str, api_key: str, model:str, toolsDesc: list = [], function_registry: dict = {}, system_prompt: str = "You are an AI Agent"):
+        # Initialize OpenAI client
+        self.client = OpenAI(base_url=base_url, api_key=api_key)
+        self.function_registry = function_registry
+        self.tools = toolsDesc
+        self.model = model
+        self.messages = [{"role": "system", "content": system_prompt}]
+        self.system_prompt = system_prompt
 
-UserPanel = Panel("💭 User:",
-                     border_style="green",
-                     expand=False,
-                     style="bold blue")
+    def add_message(self, role: str, content: str):
+        self.messages.append({"role": role, "content": content})
 
-toolPanel = Text("🛠️ Executing: ",
-                     style="bold red")
-
-response = complete(messages)
-messages.append(response)
-console.print(agentPanel)
-console.print(Markdown(response.content))
-console.print(Markdown("---"))
-
-while True:
-    console.print(UserPanel)
-    userInput = input()
-    console.print(Markdown("---"))
-    messages.append({
-        "role": "user",
-        "content": userInput
-    })
-    console.print(agentPanel)
-    while True:
-        try:
-            response = complete(messages)
-        except Exception as e:
-            saveMessages.write(str(messages))
-        messages.append(response)
-
+    def complete(self) -> str: 
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=self.messages,
+            tools=self.tools,
+            tool_choice="auto"
+        ).choices[0].message
+        self.messages.append(response)
+        
         if response.tool_calls:
             for tool_call in response.tool_calls:
-                id = tool_call.id
-                name = tool_call.function.name
-                args = tool_call.function.arguments
-                if isinstance(args, str):
-                    args = json.loads(args)
-                    
-                panelText = Text("Tool: ", style="bold blue") + Text(name, style="bold white") + "\n"
-                if args:
-                    for arg in args:
-                        panelText += Text(arg + "⤵️\n", style="bold yellow") + Text(args[arg] if len(args[arg]) < 50 else args[arg][:50] + "...", style="white") + "\n"
-                panelText += "\n"
-                result = ""
-                try:
-                    if args:
-                        result = functionRegistry[name](**args)
-                    else:
-                        result = functionRegistry[name]()
-                except Exception as e:
-                    result = f"Error executing tool {name}: {str(e)}"
-                panelText += Text("Result⤵️\n", style="bold blue") + Text(result if len(str(result)) < 50 else str(result)[:50] + "...", style="white")
-                toolPanel = Panel(
-                    panelText,
-                    border_style="red",
-                    title="🛠️ Executing Tool: ",
-                    expand=False,
-                )
-                console.print(toolPanel)
-                print()
-                messages.append({
-                    "role": "tool",
-                    "tool_call_id": id,
-                    "content": str(result)
-                })
+                tool_result = self.handle_tool_call(tool_call)
+                self.messages.append(tool_result)
+                return [response, tool_result]
         else:
-            console.print(Text("Response:", style="bold blue"))
-            console.print(Markdown(response.content))
-            console.print(Markdown("---"))
-            break
+            return [response]
+        
+    def handle_tool_call(self, tool_call) -> str:
+        name = tool_call.function.name
+        args = tool_call.function.arguments
+        if isinstance(args, str):
+                args = json.loads(args)
+        id = tool_call.id
+        result = ""
+        try:
+            result = str(self.function_registry[name](**args))
+        except Exception as e:
+            result = "Error occured while executing the tool: " + str(e)
+        return {"role": "tool", "tool_call_id": id, "content": result}
+    
+    def prompt(self, user_input: str) -> str:
+        self.add_message("user", user_input)
+        return self.complete()
+    
+    def reset_messages(self):
+        self.messages = [{"role": "system", "content": self.system_prompt}]
+
+    
+    
