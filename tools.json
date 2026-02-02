@@ -224,4 +224,21 @@
         "required": ["file"]
       }
     }}
+    ,
+    {
+    "type": "function",
+    "function": {
+      "name": "readPDF",
+      "description": "Reads and returns the text content of a PDF file.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Path to the PDF file."
+          }
+    }
+  }
+}
+    }
 ]
