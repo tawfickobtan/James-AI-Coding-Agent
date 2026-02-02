@@ -121,7 +121,6 @@ while True:
             raise e
 
         if len(response) > 1:
-            print(response[0])
             tool_call = response[0].tool_calls[0]
             id = tool_call.id
             name = tool_call.function.name
