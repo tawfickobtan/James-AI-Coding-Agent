@@ -1,5 +1,7 @@
+import json
 import os
 import subprocess
+
 
 forbidden = [
     "agent.py",
@@ -13,6 +15,14 @@ forbidden = [
     "system_prompt.txt",
     "requirements.txt"
 ]
+
+# Load memory file
+memory = {}
+try:
+    with open("memory.json", "r", encoding="utf-8") as f:
+        memory = json.load(f)
+except Exception as e:
+    memory = {}
 
 def getItemsInPath(path: str) -> str:
     try:
@@ -150,3 +160,41 @@ def renameFile(source: str, new_name: str) -> str:
     except Exception as e:
         return "Error occured: " + str(e)
     
+def rememberFact(key: str, fact: str) -> str:
+    memory[key] = fact
+    try:
+        with open("memory.json", "w", encoding="utf-8") as f:
+            json.dump(memory, f, indent=4)
+        return "Fact remembered successfully."
+    except Exception as e:
+        return "Error occured: " + str(e)
+
+def recallFact(key: str) -> str:
+    try:
+        fact = memory.get(key, "No fact found for the given key.")
+        return fact
+    except Exception as e:
+        return "Error occured: " + str(e)
+
+def forgetFact(key: str) -> str:
+    try:
+        if key in memory:
+            del memory[key]
+            with open("memory.json", "w", encoding="utf-8") as f:
+                json.dump(memory, f, indent=4)
+            return "Fact forgotten successfully."
+        else:
+            return "No fact found for the given key."
+    except Exception as e:
+        return "Error occured: " + str(e)
+    
+def listMemories() -> str:
+    try:
+        if memory:
+            facts = "\n".join([f"{k}: {v}" for k, v in memory.items()])
+            return facts
+        else:
+            return "No memories stored."
+    except Exception as e:
+        return "Error occured: " + str(e)
+

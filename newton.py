@@ -53,7 +53,12 @@ functionRegistry = {
     "fileExists": tools.fileExists,
     "getFileSize": tools.getFileSize,
     "readPDF": tools.readPDF,
-    "renameFile": tools.renameFile
+    "renameFile": tools.renameFile,
+    "rememberFact": tools.rememberFact,
+    "recallFact": tools.recallFact,
+    "forgetFact": tools.forgetFact,
+    "listMemories": tools.listMemories,
+
 }
 
 # Create welcome message
@@ -89,7 +94,9 @@ agent = Agent(
     toolsDesc=tooling,
     function_registry=functionRegistry,
     system_prompt=systemPrompt +"\n\n" + "Current Directory: " + tools.getCurrentDirectory() +
-                "\n\n" + "Current Items in Directory:\n" + tools.getItemsInPath(tools.getCurrentDirectory())
+                "\n\n" + "Current Items in Directory:\n" + tools.getItemsInPath(tools.getCurrentDirectory() +
+                "\n\n" + "Your memory storage contains the following facts:\n" + tools.listMemories() +
+                "\n" + "use the rememberFact, recallFact, forgetFact, and listMemories tools to manage your memory. Whenever a fact is worth remembering for future interactions, use the rememberFact tool to store it. Try to utilise your memory as much as possible to make interactions more personalised and effective. Try to make conversations as personal as possible based on your remembered facts."),
 )
 
 with console.status("Loading...", spinner="dots"):
@@ -98,13 +105,8 @@ with console.status("Loading...", spinner="dots"):
     except Exception as e:
         raise e
 textResponse = response[0].content
-responsePanel = Panel(
-    Markdown(textResponse),
-    border_style="bold blue",
-    title="Response:",
-    expand=False,
-)
-console.print(responsePanel)
+print(textResponse)
+console.print(Markdown(textResponse))
 console.print(Markdown("---"))
 
 while True:
@@ -143,12 +145,6 @@ while True:
             print()
         else:
             textResponse = response[0].content
-            responsePanel = Panel(
-                Markdown(textResponse),
-                border_style="bold blue",
-                title="Response:",
-                expand=False,
-            )
-            console.print(responsePanel)
+            console.print(Markdown(textResponse))
             console.print(Markdown("---"))
             break

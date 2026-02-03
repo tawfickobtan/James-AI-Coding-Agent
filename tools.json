@@ -260,5 +260,67 @@
         },
         "required": ["source", "new_name"]
       }
-    }}
+    }},
+    {
+    "type": "function",
+    "function": {
+      "name": "rememberFact",
+      "description": "Remembers a fact by storing it in memory.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "The key associated with the fact."
+          },
+          "fact": {
+            "type": "string",
+            "description": "The fact to be remembered."
+          }
+        },
+        "required": ["key", "fact"]
+      }
+    }},
+    {"type": "function",
+    "function": {
+      "name": "recallFact",
+      "description": "Recalls a fact from memory using its associated key.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "The key associated with the fact to be recalled."
+          }
+        },
+        "required": ["key"]
+      }
+    }},
+  {
+    "type": "function",
+    "function": {
+      "name": "forgetFact",
+      "description": "Forgets a fact from memory using its associated key.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "The key associated with the fact to be forgotten."
+          }
+        },
+        "required": ["key"]
+      }
+    }
+  },
+  {"type": "function",
+    "function": {
+      "name": "listMemories",
+      "description": "Lists all keys of the facts currently stored in memory.",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  }
 ]
