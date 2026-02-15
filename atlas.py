@@ -61,15 +61,16 @@ functionRegistry = {
 }
 
 # Create welcome message
-big_text = Text("""███╗   ██╗███████╗██╗    ██╗████████╗ ██████╗ ███╗   ██╗
-████╗  ██║██╔════╝██║    ██║╚══██╔══╝██╔═══██╗████╗  ██║
-██╔██╗ ██║█████╗  ██║ █╗ ██║   ██║   ██║   ██║██╔██╗ ██║
-██║╚██╗██║██╔══╝  ██║███╗██║   ██║   ██║   ██║██║╚██╗██║
-██║ ╚████║███████╗╚███╔███╔╝   ██║   ╚██████╔╝██║ ╚████║
-╚═╝  ╚═══╝╚══════╝ ╚══╝╚══╝    ╚═╝    ╚═════╝ ╚═╝  ╚═══╝
+big_text = Text(""" █████╗ ████████╗██╗      █████╗ ███████╗
+██╔══██╗╚══██╔══╝██║     ██╔══██╗██╔════╝
+███████║   ██║   ██║     ███████║███████╗
+██╔══██║   ██║   ██║     ██╔══██║╚════██║
+██║  ██║   ██║   ███████╗██║  ██║███████║
+╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚══════╝
+
 
 """, style="bold white")
-welcome_text = Text("Your File Management AI Agent", style="bold white")
+welcome_text = Text("Your Local AI Agent", style="bold white")
 version_text = Text(f"(Version: {config.get('version', '1.1')})", style="dim white")
 welcome_panel = Panel(
     big_text + welcome_text + "\n" + version_text,
