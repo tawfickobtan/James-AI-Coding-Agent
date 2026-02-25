@@ -3,3 +3,5 @@ rich>=13.0.0
 requests>=2.31.0
 sentence-transformers
 numpy
+selenium
+beautifulsoup4
