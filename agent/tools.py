@@ -7,18 +7,28 @@ from bs4 import BeautifulSoup
 
 baseDir = Path(__file__).resolve().parent
 
+def normalizePath(path: str) -> str:
+    return str(Path(path).expanduser().resolve())
+
 forbidden = [
-    "agent.py",
-    "config.json",
-    "llm.py",
-    "README.md",
-    "tools.json",
-    "tools.py",
-    ".gitignore",
-    ".git",
-    "system_prompt.txt",
-    "requirements.txt"
+    str((baseDir / "agent.py").resolve()),
+    str((baseDir / "config.json").resolve()),
+    str((baseDir / "llm.py").resolve()),
+    str((baseDir / "README.md").resolve()),
+    str((baseDir / "tools.json").resolve()),
+    str((baseDir / "tools.py").resolve()),
+    str((baseDir / ".gitignore").resolve()),
+    str((baseDir / ".git").resolve()),
+    str((baseDir / "system_prompt.txt").resolve()),
+    str((baseDir / "requirements.txt").resolve())
 ]
+
+def isForbidden(path: str) -> bool:
+    normalized = normalizePath(path)
+    for item in forbidden:
+        if normalized.endswith(item):
+            return True
+    return False
 
 # Load memory file
 memory = {}
@@ -34,26 +44,9 @@ def getItemsInPath(path: str) -> str:
         return "\n".join(items)
     except Exception as e:
         return "Error occured. " + str(e)
-    
-def getDirectoryTree(path: str, depth: int = 2) -> str:
-    if depth > 5:
-        return "Depth too large. Please choose a depth of 5 or less to avoid excessive output."
-    tree = ""
-    try:
-        for root, dirs, files in os.walk(path):
-            level = root.replace(path, "").count(os.sep)
-            if level < depth:
-                indent = " " * 4 * level
-                tree += f"{indent}{os.path.basename(root)}/\n"
-                subindent = " " * 4 * (level + 1)
-                for f in files:
-                    tree += f"{subindent}{f}\n"
-        return tree if tree else "Directory is empty."
-    except Exception as e:
-        return "Error occured. " + str(e)
 
 def createFile(file: str) -> str:
-    if file in forbidden:
+    if isForbidden(file):
         return "You are not allowed to create these files."
     try:
         with open(file, "w", encoding="utf-8") as f:
@@ -132,15 +125,6 @@ def deleteDirectory(directory: str) -> str:
         return "Directory deleted successfully."
     except Exception as e:
         return "Error occured: " + str(e)
-
-def moveFile(source: str, destination: str) -> str:
-    if source in forbidden or destination in forbidden:
-        return "You are not allowed to move these files."
-    try:
-        os.rename(source, destination)
-        return "File moved successfully."
-    except Exception as e:
-        return "Error occured: " + str(e)
     
 def moveMultipleFiles(sources: list, destination: str) -> str:
     if destination in forbidden:
@@ -158,16 +142,6 @@ def moveMultipleFiles(sources: list, destination: str) -> str:
             failed.append(source)
 
     return "Successfully moved:" + "\n" +  '\n'.join(success) + "\n\n" + "Failed to move:" + "\n" + '\n'.join(failed) + "."
-
-def copyFile(source: str, destination: str) -> str:
-    if source in forbidden or destination in forbidden:
-        return "You are not allowed to copy these files."
-    try:
-        import shutil
-        shutil.copy2(source, destination)
-        return "File copied successfully."
-    except Exception as e:
-        return "Error occured: " + str(e)
     
 def copyMultipleFiles(sources: list, destination: str) -> str:
     if destination in forbidden:
@@ -217,7 +191,6 @@ def renameFile(source: str, new_name: str) -> str:
         return "Error occured: " + str(e)
     
 # Tool functions for memory management 
-    
 def rememberFact(key: str, fact: str) -> str:
     memory[key] = fact
     try:
@@ -342,7 +315,13 @@ def extractTextFromUrl(url: str) -> str:
         if len(text) > 2000:
             text = text[:2000] + "\n\n[Content truncated...]"
         
-        return text if text else "No readable content found."
+        if text:
+            extracted_content = Path(baseDir / "../memory/extracted_content.txt").resolve()
+            with extracted_content.open("w", encoding="utf-8") as f:
+                f.write(text)
+            return "Text content extracted and saved to " + str(extracted_content) + ".\n\nUse readFileLines with the appropriate line numbers to read the content efficiently without wasting context."
+        else:
+            return "No text content could be extracted from the page."
         
     except Exception as e:
         return f"Error extracting webpage: {str(e)}"

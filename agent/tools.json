@@ -155,48 +155,6 @@
   {
     "type": "function",
     "function": {
-      "name": "moveFile",
-      "description": "Moves a file from source path to destination path.",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "source": {
-            "type": "string",
-            "description": "Source file path."
-          },
-          "destination": {
-            "type": "string",
-            "description": "Destination file path."
-          }
-        },
-        "required": ["source", "destination"]
-      }
-    }
-  },
-  {
-    "type": "function",
-    "function": {
-      "name": "copyFile",
-      "description": "Copies a file from source path to destination path.",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "source": {
-            "type": "string",
-            "description": "Source file path."
-          },
-          "destination": {
-            "type": "string",
-            "description": "Destination file path."
-          }
-        },
-        "required": ["source", "destination"]
-      }
-    }
-  },
-  {
-    "type": "function",
-    "function": {
       "name": "getCurrentDirectory",
       "description": "Returns the current working directory path.",
       "parameters": {
@@ -318,34 +276,13 @@
         "properties": {}
       }
     }
-  },
-  {
-    "type": "function",
-    "function": {
-      "name": "getDirectoryTree",
-      "description": "Returns a tree structure representing the directory and file hierarchy starting from the specified path. Returns to a maximum depth of 5 levels.",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "path": {
-            "type": "string",
-            "description": "The path of the directory to start from."
-          },
-          "depth": {
-            "type": "integer",
-            "description": "The maximum depth to traverse (default is 2)."
-          }
-        },
-        "required": ["path"]
-      }
-    }
   }
   ,
   {
     "type": "function",
     "function": {
       "name": "moveMultipleFiles",
-      "description": "Moves multiple files from source paths to a destination directory.",
+      "description": "Moves multiple files from source paths to a destination directory. Can also be used for a single file by providing a list with one item. Use this to move files and folders around the filesystem.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -369,7 +306,7 @@
     "type": "function",
     "function": {
       "name": "copyMultipleFiles",
-      "description": "Copies multiple files from source paths to a destination directory.",
+      "description": "Copies multiple files from source paths to a destination directory. Can also be used for a single file by providing a list with one item. Use this to copy files and folders around the filesystem.",
       "parameters": {
         "type": "object",
         "properties": {
