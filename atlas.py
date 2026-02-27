@@ -73,18 +73,17 @@ HELP_TEXT = """\
   [bold white]/save[/]    Save conversation to a Markdown file
   [bold white]/exit[/]    Quit AtlasCLI
   [bold white]/help[/]    Show this message
-  [bold white]/quit[/]    leave the app
 
 [bold yellow]Key Bindings[/]
   [bold white]Ctrl+L[/]   Clear chat
   [bold white]Ctrl+S[/]   Save chat
   [bold white]Ctrl+M[/]   Show memory
-  [bold white]Ctrl+Q[/]   Quit\
+  [bold white]Ctrl+Q[/]   Quit
 """
 
 # ── Styles ─────────────────────────────────────────────────────────────────────
 
-SLASH_COMMANDS = ["/clear", "/memory", "/save", "/exit", "/help", "/quit"]
+SLASH_COMMANDS = ["/clear", "/memory", "/save", "/exit", "/help"]
 
 APP_CSS = """
 #chat {
@@ -112,6 +111,33 @@ Input {
 }
 """
 
+# ── Tool icons ────────────────────────────────────────────────────────────────
+
+TOOL_ICONS: dict[str, str] = {
+    "createFile":          "📄",
+    "readFile":            "📖",
+    "readFileLines":       "📖",
+    "readPdfPages":        "📑",
+    "writeIntoFile":       "✏️",
+    "renameFile":          "✏️",
+    "fileExists":          "🔍",
+    "getFileSize":         "📏",
+    "deleteFiles":         "🗑️",
+    "deleteDirectory":     "🗑️",
+    "createDirectory":     "📁",
+    "getItemsInPath":      "📂",
+    "getCurrentDirectory": "📍",
+    "getDirectoryTree":    "🌲",
+    "moveFiles":           "✂️",
+    "copyFiles":           "📋",
+    "rememberFact":        "💾",
+    "recallFact":          "🧠",
+    "forgetFact":          "🗑️",
+    "listMemories":        "📦",
+    "searchWeb":           "🔍",
+    "extractTextFromUrl":  "🌐",
+}
+
 # ── App ────────────────────────────────────────────────────────────────────────
 
 class AtlasTUI(App):
@@ -120,6 +146,7 @@ class AtlasTUI(App):
     TITLE = "AtlasCLI"
     SUB_TITLE = f"v{config.get('version', '1.0')}  ·  {model}"
     CSS = APP_CSS
+    _last_was_tool: bool = False
 
     BINDINGS = [
         Binding("ctrl+q", "quit",        "Quit",   show=True),
@@ -220,11 +247,13 @@ class AtlasTUI(App):
     async def _run_agent(self) -> None:
         """Step through the agent until it produces a final text response."""
         self.sub_title = "Thinking..."
+        self._last_was_tool = False
         while True:
             response = await asyncio.to_thread(agent.step)
             self._render_response(response)
             if len(response) == 1:   # no tool call → Atlas is done
                 break
+        self._last_was_tool = False
         self._reset_subtitle()
 
     def _render_response(self, response: list) -> None:
@@ -239,22 +268,42 @@ class AtlasTUI(App):
                 args = json.loads(args)
             result = response[1]["content"]
 
-            self.sub_title = f"Running: {name}..."
+            icon = TOOL_ICONS.get(name, "⚙️")
+            self.sub_title = f"{icon} {name}  ·  running..."
+
+            # connector between consecutive tool calls
+            if self._last_was_tool:
+                chat.write(Text("          │", style="dim white"))
+                chat.write(Text("          │", style="dim white"))
 
             text = Text()
-            text.append("Tool: ", style="bold blue")
-            text.append(name + "\n\n", style="bold white")
-            for k, v in args.items():
-                v_str = str(v)
-                text.append(f"{k} ⤵\n", style="bold yellow")
-                text.append((v_str if len(v_str) <= 80 else v_str[:80] + "…") + "\n", style="white")
-            text.append("\nResult ⤵\n", style="bold blue")
-            text.append(result[:400] + ("…" if len(result) > 400 else ""), style="dim white")
+            text.append(f" {icon}  ", style="bold white")
+            text.append(name + "\n", style="bold white")
+            text.append("  " + "─" * 50 + "\n", style="dim white")
 
-            chat.write(Panel(text, border_style="dim white", expand=False, title="🛠️  Tool Execution"))
+            if args:
+                for k, v in args.items():
+                    v_str = str(v).replace("\n", " ")
+                    truncated = v_str if len(v_str) <= 55 else v_str[:55] + "…"
+                    text.append(f"  {k}  ", style="dim white")
+                    text.append(truncated + "\n", style="white")
+                text.append("  " + "─" * 50 + "\n", style="dim white")
+
+            result_preview = result[:350] + ("…" if len(result) > 350 else "")
+            text.append("  ↳  ", style="dim white")
+            text.append(result_preview.replace("\n", " "), style="white")
+
+            chat.write(Panel(
+                text,
+                border_style="dim white",
+                expand=False,
+                padding=(0, 1),
+            ))
+            self._last_was_tool = True
 
         else:
             # ── Text response ───────────────────────────────────────────────
+            self._last_was_tool = False
             content = response[0].content
             if content:
                 self._write_bubble("Atlas", content, label_style="bold yellow", is_markdown=True)
@@ -287,7 +336,7 @@ class AtlasTUI(App):
                 lines.append(f"**You:** {content}\n")
             elif role == "assistant" and content:
                 lines.append(f"**Atlas:** {content}\n")
-        Path(baseDir / "memory/past_conversations" / filename).write_text("\n".join(lines), encoding="utf-8")
+        Path(baseDir / "memory/conversations" / filename).write_text("\n".join(lines), encoding="utf-8")
         chat.write(Text(f"✅  Conversation saved to {filename}", style="bold green"))
 
 # ── Entry point ────────────────────────────────────────────────────────────────
