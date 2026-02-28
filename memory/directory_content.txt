@@ -1,0 +1,17 @@
+Comet.lnk
+desktop.ini
+math
+math1.pdf
+math2.pdf
+math3a.pdf
+math3b.pdf
+math4.pdf
+math6.pdf
+math7.pdf
+math8.pdf
+networks
+networks1.pdf
+networks2A.pdf
+networks2B.pdf
+networks3n4.pdf
+networks5n6.pdf
