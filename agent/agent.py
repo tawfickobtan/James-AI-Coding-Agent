@@ -17,12 +17,16 @@ class Agent:
         self.messages.append({"role": role, "content": content})
 
     def step(self) -> str: 
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=self.messages,
-            tools=self.tools,
-            tool_choice="auto"
-        ).choices[0].message
+        try: 
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=self.messages,
+                tools=self.tools,
+                tool_choice="auto"
+            ).choices[0].message
+
+        except Exception as e:
+            response = {"role": "assistant", "content": "Error occured while generating response: " + str(e), "tool_calls": []}
         self.messages.append(response)
         
         if response.tool_calls:

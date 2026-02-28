@@ -46,7 +46,7 @@ No cloud storage. No subscriptions. No tracking. Just a fast, capable agent that
 - Great for quick research or pulling in external information during a session
 
 ### 🎨 Full Terminal UI (TUI)
-- Built with [Textual](https://github.com/Textualize/rich) — a modern, reactive TUI framework
+- Built with [Textual](https://github.com/Textualize/textual) — a modern, reactive TUI framework
 - Scrollable chat view with a fixed input bar and live clock header
 - Slash commands with an **autocomplete dropdown** that appears as you type `/`
 - Keyboard shortcuts shown persistently in the footer bar
@@ -95,7 +95,7 @@ export GROQ_API_KEY="your-groq-api-key"
 ### Run AtlasCLI
 
 ```bash
-python app.py
+python atlas.py
 ```
 
 That's it. Start chatting!
@@ -146,12 +146,11 @@ Want to change Atlas's personality or behavior? Edit `configuration/AGENT.md` �
 
 | Tool | Description |
 |---|---|
-| `createFile` | Create a new file with content |
+| `createFile` | Create a new empty file |
 | `readFile` | Read the full contents of a file |
 | `readFileLines` | Read specific line ranges from a file |
-| `writeIntoFile` | Write or append content to a file |
-| `delete` | Delete a file |
-| `moveFiles` / `copyFiles` | Move or copy a single file |
+| `deleteFiles` | Delete one or more files |
+| `moveFiles` / `copyFiles` | Move or copy one or more files |
 | `renameFile` | Rename a file |
 | `fileExists` | Check if a file exists |
 | `getFileSize` | Get the size of a file |
@@ -167,7 +166,6 @@ Want to change Atlas's personality or behavior? Edit `configuration/AGENT.md` �
 | `deleteDirectory` | Delete a directory |
 | `getItemsInPath` | List contents of a directory |
 | `getCurrentDirectory` | Get the current working directory |
-| `getDirectoryTree` | Visualize folder structure with depth control |
 
 </details>
 
@@ -200,8 +198,7 @@ Want to change Atlas's personality or behavior? Edit `configuration/AGENT.md` �
 
 ```
 AtlasCLI/
-├── app.py                    # Textual TUI entry point (run this!)
-├── atlas.py                  # Legacy Rich CLI entry point
+├── atlas.py                  # Textual TUI entry point (run this!)
 ├── requirements.txt          # Python dependencies
 ├── agent/
 │   ├── agent.py              # Core Agent class with tool-calling loop

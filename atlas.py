@@ -118,7 +118,6 @@ TOOL_ICONS: dict[str, str] = {
     "readFile":            "📖",
     "readFileLines":       "📖",
     "readPdfPages":        "📑",
-    "writeIntoFile":       "✏️",
     "renameFile":          "✏️",
     "fileExists":          "🔍",
     "getFileSize":         "📏",
@@ -127,7 +126,6 @@ TOOL_ICONS: dict[str, str] = {
     "createDirectory":     "📁",
     "getItemsInPath":      "📂",
     "getCurrentDirectory": "📍",
-    "getDirectoryTree":    "🌲",
     "moveFiles":           "✂️",
     "copyFiles":           "📋",
     "rememberFact":        "💾",
@@ -176,7 +174,11 @@ class AtlasTUI(App):
         self.sub_title = "Starting up..."
         chat = self.query_one(RichLog)
         chat.write(Text("─" * 60, style="dim white"))
-        response = await asyncio.to_thread(agent.step)
+        try:
+            response = await asyncio.to_thread(agent.step) 
+        except Exception as e:
+            chat.write(Text(f"Error during startup: {e}\n\nCheck internet connection and API key environment variable.", style="bold red"))
+            return
         self._render_response(response)
         self._reset_subtitle()
 
